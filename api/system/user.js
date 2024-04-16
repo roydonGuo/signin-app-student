@@ -39,3 +39,20 @@ export function uploadAvatar(data) {
     filePath: data.filePath
   })
 }
+
+// 用户面部上传
+export function uploadFace(data) {
+  return upload({
+    url: '/system/user/profile/face',
+    name: data.name,
+    filePath: data.filePath
+  })
+}
+
+// 用户面部
+export function getFace() {
+  return request({
+    url: '/system/user/profile/getFace',
+    method: 'get'
+  })
+}

@@ -1,69 +1,33 @@
 <template>
 	<view class="work-container">
 		<!-- 宫格组件 -->
-		<uni-section title="系统管理" type="line"></uni-section>
-		<view class="grid-body">
-			<uni-grid :column="4" :showBorder="false" @change="changeGrid">
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="person-filled" size="30"></uni-icons>
-						<text class="text">用户管理</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="staff-filled" size="30"></uni-icons>
-						<text class="text">角色管理</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="color" size="30"></uni-icons>
-						<text class="text">菜单管理</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="settings-filled" size="30"></uni-icons>
-						<text class="text">部门管理</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="heart-filled" size="30"></uni-icons>
-						<text class="text">岗位管理</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="bars" size="30"></uni-icons>
-						<text class="text">字典管理</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="gear-filled" size="30"></uni-icons>
-						<text class="text">参数设置</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="chat-filled" size="30"></uni-icons>
-						<text class="text">通知公告</text>
-					</view>
-				</uni-grid-item>
-				<uni-grid-item>
-					<view class="grid-item-box">
-						<uni-icons type="wallet-filled" size="30"></uni-icons>
-						<text class="text">日志管理</text>
-					</view>
-				</uni-grid-item>
-			</uni-grid>
+		<uni-section title="人脸管理" type="line"></uni-section>
+		<view class="body">
+			<view style="text-align: center;">
+				<image class="user-face" :src="realFace"></image>
+			</view>
+			<uni-section title="人脸上传" type="line"></uni-section>
+			<view style="text-align: center;">
+				<u-upload :fileList="fileList1" @afterRead="afterRead" @delete="deletePic" name="1" multiple
+					:maxCount="1"></u-upload>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import {
+		waitSignin
+	} from "@/api/app/signinTask.js"
+	import {
+		studentSignin,
+		uploadSigninPicture
+	} from "@/api/app/signinRecord.js"
+	import {
+		uploadFace,
+		getFace
+	} from "@/api/system/user.js"
+	import config from '@/config'
 	export default {
 		data() {
 			return {
@@ -78,10 +42,23 @@
 					{
 						image: '/static/images/banner/banner03.jpg'
 					}
-				]
+				],
+				fileList1: [],
+				faceUrl: "",
+				realFace: "",
 			}
 		},
+		created() {
+			this.initgetFace()
+		},
 		methods: {
+			initgetFace() {
+				getFace().then(res => {
+					if (res.code === 200) {
+						this.realFace = res.msg
+					}
+				})
+			},
 			clickBannerItem(item) {
 				console.info(item)
 			},
@@ -90,7 +67,43 @@
 			},
 			changeGrid(e) {
 				this.$modal.showToast('模块建设中~')
-			}
+			},
+			// 删除图片
+			deletePic(event) {
+				this[`fileList${event.name}`].splice(event.index, 1)
+			},
+			// 新增图片
+			async afterRead(event) {
+				// 当设置 multiple 为 true 时, file 为数组格式，否则为对象格式
+				let lists = [].concat(event.file)
+				let fileListLen = this[`fileList${event.name}`].length
+				lists.map((item) => {
+					this[`fileList${event.name}`].push({
+						...item,
+						status: 'uploading',
+						message: '上传中'
+					})
+				})
+				for (let i = 0; i < lists.length; i++) {
+					let data = {
+						name: 'file',
+						filePath: lists[i].url
+					}
+					uploadFace(data).then(res => {
+						if (res.code === 200) {
+							this.faceUrl = res.faceUrl
+							this.realFace = this.faceUrl
+						}
+					})
+					let item = this[`fileList${event.name}`][fileListLen]
+					this[`fileList${event.name}`].splice(fileListLen, 1, Object.assign(item, {
+						status: 'success',
+						message: '',
+						url: this.faceUrl
+					}))
+					fileListLen++
+				}
+			},
 		}
 	}
 </script>
@@ -168,5 +181,10 @@
 		.image {
 			width: 100%;
 		}
+	}
+
+	.user-face {
+		margin: 0 auto;
+		object-fit: center;
 	}
 </style>

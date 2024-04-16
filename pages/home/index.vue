@@ -54,30 +54,44 @@
 	import {
 		studentSignin
 	} from "@/api/app/signinRecord.js"
+	import {
+		listAppNotice
+	} from "@/api/app/notice.js"
 	// import uniLocation from '@/uni_modules/uni-location/uni-location.js';
 
 	export default {
 		data() {
 			return {
 				status: 'more',
-				swiperData: [
-					'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-					'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-					'https://cdn.uviewui.com/uview/swiper/swiper3.png'
-				],
+				swiperData: [],
 				waitSigninList: [],
 				showEmpty: false,
 				signinDTO: {
 					taskId: null,
 					address: null,
 					addressDetail: null
-				}
+				},
+				queryParams: {
+					pageNum: 1,
+					pageSize: 5,
+					showInApp: "1",
+				},
+				// 公告表格数据
+				noticeList: [],
 			}
 		},
 		created() {
 			this.loadWaitSigninList()
+			this.getNoticeList()
 		},
 		methods: {
+			getNoticeList() {
+				listAppNotice(this.queryParams).then(response => {
+					this.noticeList = response.rows
+					console.log(this.noticeList)
+					this.swiperData = this.noticeList.map(notice => notice.noticeImgUrl);
+				})
+			},
 			leftClick() {
 				console.log('leftClick');
 			},

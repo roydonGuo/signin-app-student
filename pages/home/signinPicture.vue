@@ -17,11 +17,18 @@
 						<!-- <u--input v-model="signinDTO.pictureUrl" placeholder="请输入学号"></u--input> -->
 						<u-upload :fileList="fileList1" @afterRead="afterRead" @delete="deletePic" name="1" multiple
 							:maxCount="1"></u-upload>
+						<view class="tips">请上传无遮挡面部照片</view>
 					</u-form-item>
 				</u--form>
-				<u-button type="primary" text="提交签到" customStyle="margin-top: 50px" @click="submit"></u-button>
+				<view v-if="faceStatus" class="tips-green">人脸识别成功</view>
+				<view v-else class="tips">人脸识别失败，请重新上传</view>
+				<u-button v-if="faceStatus" type="primary" text="提交签到" customStyle="margin-top: 50px"
+					@click="submit"></u-button>
+				<u-button v-else disabled type="primary" text="提交签到" customStyle="margin-top: 50px"
+					@click="submit"></u-button>
 			</view>
 		</view>
+		<u-toast ref="uToast"></u-toast>
 	</view>
 
 </template>
@@ -46,9 +53,11 @@
 					studentNumber: null,
 					pictureUrl: null,
 					address: null,
-					addressDetail: null
+					addressDetail: null,
+					faceStatus: null
 				},
 				fileList1: [],
+				faceStatus: null,
 			}
 		},
 		onLoad(option) {
@@ -96,6 +105,8 @@
 					uploadSigninPicture(data).then(res => {
 						if (res.code === 200) {
 							this.signinDTO.pictureUrl = res.url
+							this.faceStatus = res.faceStatus
+							this.signinDTO.faceStatus = res.faceStatus == true ? '1' : '0'
 						}
 					})
 					let item = this[`fileList${event.name}`][fileListLen]
@@ -131,6 +142,16 @@
 		font-size: 36rpx;
 		font-weight: bold;
 		color: #8f8f94;
+	}
+
+	.tips {
+		color: red;
+		font-size: 0.8rem;
+	}
+
+	.tips-green {
+		color: green;
+		font-size: 0.8rem;
 	}
 
 	.waitSignin-list {

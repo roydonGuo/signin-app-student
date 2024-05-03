@@ -21,28 +21,35 @@
 				"navigationBarTitleText": "",
 				"navigationStyle": "custom"
 			}
-		}, 
+		},
 		{
 			"path": "pages/home/signin",
 			"style": {
 				"navigationBarTitleText": "签到",
 				"navigationStyle": "custom"
 			}
-		}, 
+		},
 		{
 			"path": "pages/home/signinLocate",
 			"style": {
 				"navigationBarTitleText": "定位签到",
 				"navigationStyle": "custom"
 			}
-		}, 
+		},
 		{
 			"path": "pages/home/signinPicture",
 			"style": {
 				"navigationBarTitleText": "拍照签到",
 				"navigationStyle": "custom"
 			}
-		}, 
+		},
+		{
+			"path": "pages/home/classinfo",
+			"style": {
+				"navigationBarTitleText": "班级详情",
+				"navigationStyle": "custom"
+			}
+		},
 		{
 			"path": "pages/search/index",
 			"style": {

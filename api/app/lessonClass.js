@@ -8,3 +8,18 @@ export function searchClassPage(data) {
 		data: data
 	})
 }
+// 班长管理的班级列表
+export function monitorClassList() {
+	return request({
+		url: '/app/lessonClass/monitorClassList',
+		method: 'get'
+	})
+}
+
+// 班级学生列表
+export function classStudentList(classId) {
+	return request({
+		'url': '/app/lessonClassStudent/studentList/' + classId,
+		'method': 'get'
+	})
+}

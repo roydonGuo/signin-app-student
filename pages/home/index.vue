@@ -40,6 +40,28 @@
 						</view>
 					</view>
 				</view>
+				<view><uni-section title="我管理的班级" type="line"></uni-section>
+					<view>
+						<view class="less-class" v-for="(item, index) in lessonClassList" :key="index"
+							@click="handleRouterClassinfo(item)">
+							<view class="unique-code ">
+								<text>唯一标识：</text>
+								<text class="code">{{item.uniqueCode}}</text>
+							</view>
+							<view class="info">
+								<view>
+									<text>班级名称：<text class="fs1 fw600">{{item.className}}</text></text>
+								</view>
+								<view>
+									<text>班级人数：{{item.studentCount}}</text>
+								</view>
+								<view>
+									<text>创建时间：{{item.createTime}}</text>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
 			</view>
 
 		</view>
@@ -57,6 +79,9 @@
 	import {
 		listAppNotice
 	} from "@/api/app/notice.js"
+	import {
+		monitorClassList
+	} from "@/api/app/lessonClass.js"
 	// import uniLocation from '@/uni_modules/uni-location/uni-location.js';
 
 	export default {
@@ -78,11 +103,13 @@
 				},
 				// 公告表格数据
 				noticeList: [],
+				lessonClassList: [],
 			}
 		},
 		created() {
 			this.loadWaitSigninList()
 			this.getNoticeList()
+			this.getMonitorClassList()
 		},
 		methods: {
 			getNoticeList() {
@@ -109,6 +136,13 @@
 					//结束下拉刷新
 					uni.stopPullDownRefresh();
 				}, 1000);
+			},
+			getMonitorClassList() {
+				monitorClassList().then(res => {
+					if (res.code === 200) {
+						this.lessonClassList = res.data
+					}
+				})
 			},
 			loadWaitSigninList() {
 				waitSignin().then(res => {
@@ -177,6 +211,11 @@
 			scrolltolower() {
 
 			},
+			handleRouterClassinfo(item) {
+				console.log(item)
+				this.$tab.navigateTo(`/pages/home/classinfo?classId=${item.classId}&className=${item.className}`)
+				
+			}
 		},
 
 	}
@@ -217,5 +256,30 @@
 				margin: .5rem 0;
 			}
 		}
+	}
+
+	.less-class {
+		display: flex;
+		align-items: center;
+		padding: 1rem;
+		border-radius: 0.5rem;
+		background-color: white;
+		margin-bottom: 1rem;
+
+		.unique-code {
+			display: flex;
+			padding: .5rem;
+			flex-direction: column;
+
+			.code {
+				border-radius: 0.5rem;
+				text-align: center;
+				color: white;
+				padding: .5rem;
+				background-color: gray;
+			}
+		}
+
+		.info {}
 	}
 </style>
